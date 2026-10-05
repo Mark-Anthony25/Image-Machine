@@ -33,9 +33,7 @@ export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }
   return (
     <aside className="recipe" aria-labelledby="recipe-heading">
       <div className="section-heading">
-        <h2 id="recipe-heading">
-          <span className="section-number">02</span> Your image recipe
-        </h2>
+        <h2 id="recipe-heading">Processing steps</h2>
         <button
           className="text-button"
           aria-label="Reset recipe"
@@ -46,10 +44,29 @@ export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }
         </button>
       </div>
       <p className="recipe-intro">Add a step. See what changes.</p>
-      <div className="recipe-start">
-        <Icon name="pixel" size={18} />
-        <span>Original image</span>
-        <span className="small muted">INPUT</span>
+      <div className="add-steps">
+        <h3 className="visually-hidden">Add a processing step</h3>
+        {operations.map((o) => (
+          <button
+            key={o.type}
+            className="operation-button"
+            aria-label={`Add ${o.beginnerName}`}
+            disabled={steps.length >= 12}
+            onClick={() => onAdd(o.type)}
+          >
+            <span className="operation-icon">
+              <Icon name={operationIcons[o.type]} />
+            </span>
+            <span>
+              {o.beginnerName}
+              <small>{o.description}</small>
+            </span>
+            <Icon name="plus" size={18} />
+          </button>
+        ))}
+        {steps.length >= 12 && (
+          <p className="small">This recipe has 12 steps. Remove a step to add another.</p>
+        )}
       </div>
       <ol className="step-list">
         {steps.map((step, index) => {
@@ -152,46 +169,8 @@ export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }
         })}
       </ol>
       {!steps.length && (
-        <div className="empty-recipe">
-          <span className="empty-path" aria-hidden="true">
-            ↓
-          </span>
-          <p>
-            What could your image become?
-            <br />
-            <span className="muted">Try removing the color first.</span>
-          </p>
-        </div>
+        <p className="empty-recipe">Your image is unchanged. Try Remove Color to begin.</p>
       )}
-      <div className="recipe-end">
-        <span className="output-marker" />
-        <span>Your result</span>
-        <span className="small muted">OUTPUT</span>
-      </div>
-      <div className="add-steps">
-        <h3>Add a processing step</h3>
-        {operations.map((o) => (
-          <button
-            key={o.type}
-            className="operation-button"
-            aria-label={`Add ${o.beginnerName}`}
-            disabled={steps.length >= 12}
-            onClick={() => onAdd(o.type)}
-          >
-            <span className="operation-icon">
-              <Icon name={operationIcons[o.type]} />
-            </span>
-            <span>
-              {o.beginnerName}
-              <small>{o.description}</small>
-            </span>
-            <Icon name="plus" size={18} />
-          </button>
-        ))}
-        {steps.length >= 12 && (
-          <p className="small">This recipe has 12 steps. Remove a step to add another.</p>
-        )}
-      </div>
     </aside>
   );
 }

@@ -3,6 +3,7 @@ import { operationByType } from '../content/operations';
 import type { PixelImage, ProcessingStep } from '../processing/types';
 import { PixelCanvas } from './PixelCanvas';
 import type { PixelPosition } from './PixelCanvas';
+import { ImageSkeleton, LearningModel } from './PreviewSkeleton';
 import { Icon } from './Icon';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
   pixel: PixelPosition | null;
   onPixel: (p: PixelPosition) => void;
   busy: boolean;
+  loading: boolean;
   sourceName: string;
 }
 export function Comparison({
@@ -27,6 +29,7 @@ export function Comparison({
   pixel,
   onPixel,
   busy,
+  loading,
   sourceName,
 }: Props) {
   const [mode, setMode] = useState<'split' | 'slider' | 'result'>('split'),
@@ -38,16 +41,14 @@ export function Comparison({
   return (
     <section className="preview" aria-labelledby="preview-heading">
       <div className="section-heading">
-        <h2 id="preview-heading">
-          <span className="section-number">03</span> See what changes
-        </h2>
+        <h2 id="preview-heading">Preview</h2>
         <span
           className={`processing-status ${busy ? 'working' : ''}`}
           role="status"
           aria-label="Processing status"
         >
-          <span aria-hidden="true">{busy ? '↻' : '✓'}</span>
-          {busy ? 'Changing pixels…' : 'Ready to experiment'}
+          <span aria-hidden="true">{loading || busy ? '↻' : '✓'}</span>
+          {loading ? 'Loading image…' : busy ? 'Changing pixels…' : 'Ready to experiment'}
         </span>
       </div>
       <div className="preview-toolbar">
@@ -78,26 +79,32 @@ export function Comparison({
           ))}
         </div>
       </div>
-      {mode === 'split' ? (
-        <div className="split-preview">
+      {loading ? (
+        <ImageSkeleton mode={mode} />
+      ) : mode === 'split' ? (
+        <div className="split-preview" aria-busy={busy}>
           <figure>
             <figcaption>
               <span>Before</span>
               <small>{scope === 'all' ? 'Original image' : 'Step input'}</small>
             </figcaption>
-            <PixelCanvas image={before} label={beforeLabel} pixel={pixel} onPixel={onPixel} />
+            <div className="image-surface">
+              <PixelCanvas image={before} label={beforeLabel} pixel={pixel} onPixel={onPixel} />
+            </div>
           </figure>
           <figure>
             <figcaption>
               <span>After</span>
               <small>{scope === 'all' ? 'Your result' : name}</small>
             </figcaption>
-            <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
+            <div className="image-surface">
+              <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
+            </div>
           </figure>
         </div>
       ) : mode === 'slider' ? (
-        <div className="slider-preview">
-          <div className="slider-images">
+        <div className="slider-preview" aria-busy={busy}>
+          <div className="slider-images image-surface">
             <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
             <div className="slider-before" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }}>
               <PixelCanvas image={before} label={beforeLabel} pixel={pixel} onPixel={onPixel} />
@@ -121,12 +128,14 @@ export function Comparison({
           </label>
         </div>
       ) : (
-        <figure className="result-preview">
+        <figure className="result-preview" aria-busy={busy}>
           <figcaption>
             <span>Your result</span>
             <small>{scope === 'all' ? 'All enabled steps' : name}</small>
           </figcaption>
-          <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
+          <div className="image-surface">
+            <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
+          </div>
         </figure>
       )}
       <div className="preview-meta">
@@ -135,17 +144,7 @@ export function Comparison({
         </span>
         <span>Click or tap to look at a pixel</span>
       </div>
-      <div className="machine-model" aria-label="Learning model">
-        <span>Image</span>
-        <Icon name="arrow" size={15} />
-        <span>Pixels</span>
-        <Icon name="arrow" size={15} />
-        <span>Transformation</span>
-        <Icon name="arrow" size={15} />
-        <span>New values</span>
-        <Icon name="arrow" size={15} />
-        <span>Useful information</span>
-      </div>
+      <LearningModel />
     </section>
   );
 }

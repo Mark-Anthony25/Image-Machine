@@ -14,7 +14,7 @@ test('a beginner transforms an image, inspects a pixel, and understands why', as
   const canvas = page.getByRole('img', {
     name: 'After processing. Click or tap to inspect a pixel.',
   });
-  await canvas.click({ position: { x: 150, y: 100 } });
+  await canvas.click();
   await expect(page.getByTestId('pixel-after')).toBeVisible();
   const values = await page.getByTestId('pixel-after').getAttribute('data-rgb');
   const channels = values!.split(',');

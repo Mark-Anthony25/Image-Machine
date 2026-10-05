@@ -12,7 +12,7 @@ test('the untouched input is explained truthfully', async ({ page }) => {
 test('the first mobile transformation is reachable immediately', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific first action');
   await page.goto('/');
-  const button = page.getByRole('button', { name: 'Quick add Remove Color' });
+  const button = page.getByRole('button', { name: 'Add Remove Color' });
   await expect(button).toBeInViewport();
   await button.tap();
   await expect(page.locator('[data-step-type=grayscale]')).toHaveCount(1);

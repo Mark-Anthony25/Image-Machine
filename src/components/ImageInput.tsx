@@ -34,13 +34,11 @@ export function ImageInput({
       }}
     >
       <div className="section-heading">
-        <h2 id="input-heading">
-          <span className="section-number">01</span> Put an image in
-        </h2>
-        <span className="small muted">
-          {loading ? 'Loading image…' : 'Start with a sample or your own'}
-        </span>
+        <h2 id="input-heading">Choose an image</h2>
       </div>
+      <p className="input-note">
+        {loading ? 'Loading image…' : 'Try a sample, or use your own image.'}
+      </p>
       <div className="input-options">
         <div className="source-buttons">
           <button className="secondary-button" onClick={() => file.current?.click()}>

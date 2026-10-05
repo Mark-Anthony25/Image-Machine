@@ -10,6 +10,7 @@ import type { PixelPosition } from './components/PixelCanvas';
 import { ImageInput } from './components/ImageInput';
 import { CameraDialog } from './components/CameraDialog';
 import { StepList } from './components/StepList';
+import { PreviewSkeleton } from './components/PreviewSkeleton';
 import { Comparison } from './components/Comparison';
 import { PixelInspector } from './components/PixelInspector';
 import { Explanation } from './components/Explanation';
@@ -108,6 +109,7 @@ export default function App() {
     };
     setSteps([...steps, step]);
     setSelected(step.id);
+    setScope('all');
     setAttempted(true);
   }
   function changeSteps(next: ProcessingStep[]) {
@@ -187,7 +189,7 @@ export default function App() {
             ))}
           </nav>
           <span className="header-note">
-            <Icon name="lock" size={14} /> Made to explore. Private by design.
+            <Icon name="lock" size={14} /> Local processing
           </span>
         </div>
       </header>
@@ -198,20 +200,15 @@ export default function App() {
         {view === 'Playground' ? (
           <>
             <div className="playground-intro">
-              <div>
-                <span className="eyebrow">An image-processing playground</span>
-                <h1>See how computers transform images.</h1>
-                <p>Put an image in. Change its pixels. Discover what happens.</p>
-              </div>
-              <span className="intro-note">No code. Just curiosity.</span>
+              <h1>Playground</h1>
+              <p>See how computers transform images.</p>
             </div>
-            <ImageInput
-              sampleId={sampleId}
-              onFile={(file) => void loadImage(readImageFile(file), file.name, '')}
-              onSample={(id) => loadSample(id)}
-              onCamera={() => setCamera(true)}
-              loading={loading}
-            />
+            <nav className="workspace-jumps" aria-label="Workspace sections">
+              <a href="#image-controls">Edit image &amp; steps</a>
+              <a href="#preview-heading">
+                See preview <Icon name="arrow" size={15} />
+              </a>
+            </nav>
             {(inputError || pipeline.error) && (
               <div role="alert" className="error-message">
                 {inputError || pipeline.error}
@@ -224,18 +221,6 @@ export default function App() {
                     Dismiss
                   </button>
                 )}
-              </div>
-            )}
-            {source && !steps.length && (
-              <div className="mobile-first-step">
-                <span>See your first transformation.</span>
-                <button
-                  className="secondary-button"
-                  onClick={() => addStep('grayscale')}
-                  aria-label="Quick add Remove Color"
-                >
-                  <Icon name="color" size={17} /> Remove Color
-                </button>
               </div>
             )}
             {challenge && (
@@ -271,17 +256,26 @@ export default function App() {
               </section>
             )}
             <div className="workspace">
-              <StepList
-                steps={steps}
-                selected={selected}
-                onAdd={addStep}
-                onChange={changeSteps}
-                onSelect={(id) => {
-                  setSelected(id);
-                  setScope('step');
-                }}
-                onReset={reset}
-              />
+              <div className="control-panel" id="image-controls">
+                <ImageInput
+                  sampleId={sampleId}
+                  onFile={(file) => void loadImage(readImageFile(file), file.name, '')}
+                  onSample={(id) => loadSample(id)}
+                  onCamera={() => setCamera(true)}
+                  loading={loading}
+                />
+                <StepList
+                  steps={steps}
+                  selected={selected}
+                  onAdd={addStep}
+                  onChange={changeSteps}
+                  onSelect={(id) => {
+                    setSelected(id);
+                    setScope('step');
+                  }}
+                  onReset={reset}
+                />
+              </div>
               <div className="workspace-main">
                 {before && after ? (
                   <>
@@ -294,7 +288,8 @@ export default function App() {
                       onScope={setScope}
                       pixel={pixel}
                       onPixel={setPixel}
-                      busy={pipeline.busy || loading}
+                      busy={pipeline.busy}
+                      loading={loading}
                       sourceName={sourceName}
                     />
                     {activeSteps >= 2 && (
@@ -325,10 +320,10 @@ export default function App() {
                       />
                     </div>
                   </>
+                ) : loading ? (
+                  <PreviewSkeleton />
                 ) : (
-                  <div className="loading-image" role="status">
-                    {loading ? 'Getting your first image ready…' : 'Choose an image to begin.'}
-                  </div>
+                  <div className="loading-image">Choose a sample or upload an image to begin.</div>
                 )}
               </div>
             </div>
@@ -398,7 +393,6 @@ export default function App() {
       <footer className="site-footer">
         <div>
           <span className="footer-brand">Image Machine</span>
-          <span>See it. Try it. Understand it.</span>
         </div>
         <p>
           <Icon name="lock" size={14} /> Your images stay on your device. Processing happens in your
