@@ -38,7 +38,7 @@ function PixelValues({
       </dl>
       {gray && (
         <p className="intensity-label">
-          Intensity <strong>{values[0]}</strong>
+          Brightness <strong>{values[0]}</strong>
         </p>
       )}
     </div>
@@ -60,28 +60,13 @@ export function PixelInspector({
     <section className="inspector" aria-labelledby="inspector-heading">
       <div className="section-heading">
         <h2 id="inspector-heading">
-          <Icon name="pixel" size={20} /> Pixel inspector
+          <Icon name="pixel" size={20} /> Pixel details
         </h2>
-        <span className="small muted">The numbers behind the image</span>
+        <span className="small muted">Compare the same pixel before and after</span>
       </div>
       {!pixel ? (
         <div className="inspector-empty">
-          <div className="pixel-grid-icon" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </div>
-          <p>
-            Every image is made of tiny pixels.
-            <br />
-            <span className="muted">Click anywhere on an image to meet one.</span>
-          </p>
+          <p>Pick a point in either image to see its color numbers.</p>
           <button className="text-button" onClick={() => onPixel(p)}>
             Inspect the center pixel
           </button>
@@ -118,10 +103,12 @@ export function PixelInspector({
             <p>
               One pixel, up close.
               <br />
-              <span className="muted">Each channel is a number from 0 to 255.</span>
+              <span className="muted">Each color number goes from 0 to 255.</span>
             </p>
           </div>
-          <p className="small muted">Focus an image and use arrow keys to move one pixel.</p>
+          <p className="small muted">
+            Tip: use the arrow keys on an image to explore nearby pixels.
+          </p>
         </>
       )}
     </section>

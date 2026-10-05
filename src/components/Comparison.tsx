@@ -3,7 +3,7 @@ import { operationByType } from '../content/operations';
 import type { PixelImage, ProcessingStep } from '../processing/types';
 import { PixelCanvas } from './PixelCanvas';
 import type { PixelPosition } from './PixelCanvas';
-import { ImageSkeleton, LearningModel } from './PreviewSkeleton';
+import { ImageSkeleton } from './PreviewSkeleton';
 import { Icon } from './Icon';
 
 interface Props {
@@ -48,37 +48,40 @@ export function Comparison({
           aria-label="Processing status"
         >
           <span aria-hidden="true">{loading || busy ? '↻' : '✓'}</span>
-          {loading ? 'Loading image…' : busy ? 'Changing pixels…' : 'Ready to experiment'}
+          {loading ? 'Loading image…' : busy ? 'Updating…' : 'Ready'}
         </span>
       </div>
-      <div className="preview-toolbar">
-        <label className="scope-label">
-          Compare
-          <select
-            aria-label="Comparison scope"
-            value={scope}
-            onChange={(e) => onScope(e.target.value as 'all' | 'step')}
-          >
-            <option value="all">Original → final result</option>
-            <option value="step" disabled={!step}>
-              Input → {name}
-            </option>
-          </select>
-        </label>
-        <div className="segmented" aria-label="Comparison display">
-          {(
-            [
-              ['split', 'Side by side'],
-              ['slider', 'Slider'],
-              ['result', 'Result'],
-            ] as const
-          ).map(([key, label]) => (
-            <button key={key} aria-pressed={mode === key} onClick={() => setMode(key)}>
-              {label}
-            </button>
-          ))}
+      <details className="view-options">
+        <summary>View options</summary>
+        <div className="preview-toolbar">
+          <label className="scope-label">
+            Compare
+            <select
+              aria-label="Compare images"
+              value={scope}
+              onChange={(e) => onScope(e.target.value as 'all' | 'step')}
+            >
+              <option value="all">Starting image → result</option>
+              <option value="step" disabled={!step}>
+                Before → {name}
+              </option>
+            </select>
+          </label>
+          <div className="segmented" aria-label="Comparison display">
+            {(
+              [
+                ['split', 'Side by side'],
+                ['slider', 'Slider'],
+                ['result', 'Result'],
+              ] as const
+            ).map(([key, label]) => (
+              <button key={key} aria-pressed={mode === key} onClick={() => setMode(key)}>
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </details>
       {loading ? (
         <ImageSkeleton mode={mode} />
       ) : mode === 'split' ? (
@@ -86,7 +89,7 @@ export function Comparison({
           <figure>
             <figcaption>
               <span>Before</span>
-              <small>{scope === 'all' ? 'Original image' : 'Step input'}</small>
+              <small>{scope === 'all' ? 'Original image' : 'Before this step'}</small>
             </figcaption>
             <div className="image-surface">
               <PixelCanvas image={before} label={beforeLabel} pixel={pixel} onPixel={onPixel} />
@@ -131,7 +134,7 @@ export function Comparison({
         <figure className="result-preview" aria-busy={busy}>
           <figcaption>
             <span>Your result</span>
-            <small>{scope === 'all' ? 'All enabled steps' : name}</small>
+            <small>{scope === 'all' ? 'Your steps' : name}</small>
           </figcaption>
           <div className="image-surface">
             <PixelCanvas image={after} label={afterLabel} pixel={pixel} onPixel={onPixel} />
@@ -140,11 +143,10 @@ export function Comparison({
       )}
       <div className="preview-meta">
         <span>
-          <Icon name="pixel" size={15} /> {sourceName} · {after.width} × {after.height} pixels
+          <Icon name="pixel" size={15} /> {sourceName}
         </span>
-        <span>Click or tap to look at a pixel</span>
+        <span>Tap an image to explore its pixels</span>
       </div>
-      <LearningModel />
     </section>
   );
 }

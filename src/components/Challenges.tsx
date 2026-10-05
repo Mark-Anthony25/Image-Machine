@@ -8,8 +8,8 @@ export function Challenges({ onStart }: { onStart: (id: ChallengeId) => void }) 
     <div className="challenges-page">
       <div className="page-intro">
         <span className="eyebrow">Learn by trying</span>
-        <h1>Four small discoveries.</h1>
-        <p>No quiz. No score. Just an image, a question, and room to experiment.</p>
+        <h1>Try a challenge</h1>
+        <p>Choose a goal and see what you can discover.</p>
       </div>
       <div className="challenge-grid">
         {challenges.map((c) => (
@@ -37,7 +37,7 @@ export function Challenges({ onStart }: { onStart: (id: ChallengeId) => void }) 
         ))}
       </div>
       <p className="challenge-note">
-        There can be more than one useful recipe. Compare what changes and decide what helps.
+        There can be more than one way to reach a goal. Try a few steps and compare.
       </p>
     </div>
   );

@@ -27,32 +27,31 @@ const define = (content: Omit<OperationDefinition, 'process'>): OperationDefinit
 export const operations: OperationDefinition[] = [
   define({
     type: 'grayscale',
-    beginnerName: 'Remove Color',
+    beginnerName: 'Remove color',
     technicalName: 'Grayscale conversion',
-    description: 'Keep the brightness. Leave the color behind.',
-    simpleExplanation: 'The colors disappear. Each pixel keeps a brightness value.',
+    description: 'Turn colors into shades of gray.',
+    simpleExplanation: 'The colors become shades of gray. Light and dark areas remain.',
     detailedExplanation:
-      'A color pixel contains red, green, and blue values. Grayscale combines them into one brightness value, also called intensity. Red, green, and blue become equal, so the pixel looks gray.',
+      'Every tiny square in an image is a pixel. Its red, green, and blue numbers describe its color. This step combines those numbers to show how light or dark the pixel is.',
     technicalExplanation:
       'Gray = round(0.299 × R + 0.587 × G + 0.114 × B). Each output channel receives this value. Green has the largest weight because human vision is especially sensitive to it.',
     purpose:
-      'A computer may only need light and dark information to find a shape. Removing color simplifies the information it has to examine.',
+      'Sometimes a computer only needs light and dark areas to find a shape. Color can be left out.',
     parameter: null,
   }),
   define({
     type: 'brightness',
-    beginnerName: 'Brightness',
+    beginnerName: 'Adjust brightness',
     technicalName: 'Intensity adjustment',
-    description: 'Make every pixel brighter or darker.',
-    simpleExplanation: 'Pixel values rise or fall, making the image lighter or darker.',
+    description: 'Make the image lighter or darker.',
+    simpleExplanation: 'The image gets lighter or darker.',
     detailedExplanation:
-      'Each color channel is a number between 0 and 255. Adding the same amount to each channel raises brightness; subtracting lowers it. Values cannot go below 0 or above 255. When they hit a limit, detail can disappear. This is called clipping.',
+      'Pixels store color as numbers from 0 to 255. Raising the numbers makes the image lighter; lowering them makes it darker. At either limit, some details can disappear.',
     technicalExplanation:
-      'Output channel = clamp(input channel + adjustment, 0, 255). For example, 240 + 30 becomes 255, not 270. Clipped information cannot be recovered by darkening afterward.',
-    purpose:
-      'Changing brightness can make dim information easier to see. Be careful: clipping can remove details that another processing step needs.',
+      'Output channel = clamp(input channel + adjustment, 0, 255). For example, 240 + 30 becomes 255, not 270. Hitting a limit is called clipping. Clipped information cannot be recovered by darkening afterward.',
+    purpose: 'Lightening a dim image can reveal details. Too much can hide them again.',
     parameter: {
-      label: 'Brightness adjustment',
+      label: 'Brightness',
       min: -120,
       max: 120,
       step: 1,
@@ -64,30 +63,28 @@ export const operations: OperationDefinition[] = [
     type: 'blur',
     beginnerName: 'Soften',
     technicalName: 'Gaussian blur',
-    description: 'Let neighboring pixels blend together.',
-    simpleExplanation: 'Small details soften as nearby pixel values are combined.',
+    description: 'Smooth out small details.',
+    simpleExplanation: 'Small details become softer and less noticeable.',
     detailedExplanation:
-      'Every pixel borrows a little information from its neighbors. Closer pixels matter more than distant ones. Small specks become less noticeable, but strong blur can also wash away useful boundaries.',
+      'Each pixel blends with nearby pixels. Small specks fade into their surroundings. Too much softening can also hide the outlines you want to keep.',
     technicalExplanation:
-      'A Gaussian kernel assigns weights proportional to exp(−distance² / (2σ²)). We normalize the weights to sum to 1, then apply a horizontal and a vertical pass to each RGB channel. Radius = ceil(3σ); border pixels are repeated.',
-    purpose:
-      'Smoothing can reduce noise before finding edges. This prepares an image for the next step; it is often called preprocessing.',
-    parameter: { label: 'Soften amount', min: 0.5, max: 4, step: 0.5, initial: 1.5, unit: ' σ' },
+      'A Gaussian kernel assigns weights proportional to exp(−distance² / (2σ²)). We normalize the weights to sum to 1, then apply a horizontal and a vertical pass to each RGB channel. Radius = ceil(3σ); border pixels are repeated. Softness controls σ. Preparing an image for another step is called preprocessing.',
+    purpose: 'Softening can remove distracting specks before a computer looks for outlines.',
+    parameter: { label: 'Softness', min: 0.5, max: 4, step: 0.5, initial: 1.5, unit: '' },
   }),
   define({
     type: 'threshold',
-    beginnerName: 'Separate Light & Dark',
+    beginnerName: 'Black & white',
     technicalName: 'Binary thresholding',
-    description: 'Turn brightness into a yes-or-no decision.',
-    simpleExplanation: 'Pixels become black or white depending on their brightness.',
+    description: 'Separate lighter parts from darker parts.',
+    simpleExplanation: 'Lighter pixels turn white. Darker pixels turn black.',
     detailedExplanation:
-      'The threshold is a dividing line. Pixels at or above it become white; darker pixels become black. Moving the line changes which parts belong to each group. Separating an object from its background is a simple form of segmentation.',
+      'The slider sets a dividing line between light and dark. Pixels at or above it turn white; the rest turn black. Move it until an object stands out from its background.',
     technicalExplanation:
-      'First calculate rounded grayscale intensity. If intensity ≥ threshold, output 255; otherwise output 0. All three RGB channels receive the same value. A single threshold works best with a contrasting background.',
-    purpose:
-      'A computer can separate an object from its background and then examine its shape or count connected objects.',
+      'First calculate rounded grayscale intensity. If intensity ≥ threshold, output 255; otherwise output 0. All three RGB channels receive the same value. A single threshold works best with a contrasting background. Separating an object this way is a simple form of segmentation.',
+    purpose: 'Separating an object from its background makes its shape easier to find or count.',
     parameter: {
-      label: 'Light / dark dividing line',
+      label: 'Light / dark split',
       min: 0,
       max: 255,
       step: 1,
@@ -97,17 +94,16 @@ export const operations: OperationDefinition[] = [
   }),
   define({
     type: 'edges',
-    beginnerName: 'Find Edges',
+    beginnerName: 'Find edges',
     technicalName: 'Sobel edge detection',
-    description: 'Reveal places where brightness changes.',
-    simpleExplanation: 'Strong changes between neighboring pixels become bright lines.',
+    description: 'Show the outlines of shapes.',
+    simpleExplanation: 'Outlines become bright lines. Areas with little change become dark.',
     detailedExplanation:
-      'A computer looks for sudden brightness differences, both across and down the image. Flat areas become dark; boundaries become bright. Texture and noise can also look like boundaries, which is why softening first can help.',
+      'The computer compares nearby pixels. A sharp change in brightness becomes a bright line. Small specks can make extra lines too, so try softening first.',
     technicalExplanation:
       'Convert RGB to intensity, then apply the 3×3 Sobel kernels Gx = [−1,0,1; −2,0,2; −1,0,1] and Gy = [−1,−2,−1; 0,0,0; 1,2,1]. Output = clamp(round(√(Gx² + Gy²) × sensitivity / 4), 0, 255). Border pixels are repeated.',
-    purpose:
-      'Boundaries contain useful clues about object shapes. Edge detection extracts information that later computer vision tasks can use.',
-    parameter: { label: 'Edge sensitivity', min: 0.5, max: 3, step: 0.25, initial: 1, unit: '×' },
+    purpose: 'Outlines help a computer find shapes without needing every detail of the image.',
+    parameter: { label: 'Edge strength', min: 0.5, max: 3, step: 0.25, initial: 1, unit: '' },
   }),
 ];
 export const operationByType = Object.fromEntries(operations.map((o) => [o.type, o])) as Record<

@@ -35,7 +35,7 @@ export function Learn({
             Each number ranges from <strong>0</strong> (none of that color) to <strong>255</strong>{' '}
             (the most). Together, the numbers describe a color.
           </p>
-          <p>Processing changes these numbers to make useful information easier to find.</p>
+          <p>Changing these numbers can help a computer find shapes and details.</p>
         </div>
         <div className="rgb-demo">
           <div className="demo-color" role="img" aria-label="Example orange pixel" />
@@ -57,7 +57,7 @@ export function Learn({
         </div>
       </section>
       <section className="learning-operations">
-        <span className="eyebrow">Five ways to change the information</span>
+        <span className="eyebrow">Five simple changes</span>
         <h2>Small steps, useful changes.</h2>
         <div className="learning-operation-grid">
           {operations.map((o, i) => (
@@ -68,7 +68,6 @@ export function Learn({
               <details>
                 <summary>Why use it?</summary>
                 <p>{o.purpose}</p>
-                <span className="small muted">Technical name: {o.technicalName}</span>
               </details>
             </article>
           ))}
@@ -78,8 +77,8 @@ export function Learn({
       <div className="learning-end">
         <Icon name="pixel" />
         <p>
-          An image is made of pixels containing numerical values. Image processing changes those
-          values step by step to produce useful information.
+          An image is made of pixels containing numbers. Image processing changes those values step
+          by step to reveal useful details.
         </p>
       </div>
     </div>

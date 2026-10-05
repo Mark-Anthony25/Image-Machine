@@ -1,3 +1,4 @@
+import { addStep, stepOptions, viewOptions } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('all navigation and comparison controls fit narrow screens at 200% text', async ({ page }) => {
@@ -12,6 +13,7 @@ test('all navigation and comparison controls fit narrow screens at 200% text', a
       await page.evaluate(() => document.documentElement.scrollWidth),
       `Document width at ${width}`,
     ).toBeLessThanOrEqual(width + 1);
+    await viewOptions(page);
     for (const name of [
       'Playground',
       'Learn',
@@ -43,9 +45,10 @@ test('all navigation and comparison controls fit narrow screens at 200% text', a
 
 test('a disabled step explains that it leaves the pixels unchanged', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Add Remove Color', exact: true }).click();
-  await page.getByRole('checkbox', { name: 'Enable Remove Color' }).uncheck();
+  await addStep(page, 'Remove color');
+  await stepOptions(page, 'Remove color');
+  await page.getByRole('checkbox', { name: 'Use this step: Remove color' }).uncheck();
   await expect(
-    page.getByText('This step is off. Its input pixels pass through unchanged.', { exact: true }),
+    page.getByText('This step is off, so it leaves the image unchanged.', { exact: true }),
   ).toBeVisible();
 });

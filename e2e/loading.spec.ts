@@ -1,3 +1,4 @@
+import { addStep, imageChoices, viewOptions } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('initial image loading reserves preview space and announces its state', async ({ page }) => {
@@ -32,10 +33,11 @@ test('changing samples uses a skeleton and then shows the new pixels', async ({ 
     }
     await route.continue();
   });
-  await page.getByRole('button', { name: 'Use sample The mug' }).click();
+  await imageChoices(page);
+  await page.getByRole('button', { name: 'Use sample Mug', exact: true }).click();
   await expect(page.getByRole('status', { name: 'Loading image preview' })).toBeVisible();
   release();
-  await expect(page.getByText('The mug · 720 × 480 pixels')).toBeVisible();
+  await expect(page.locator('.preview-meta').getByText('Mug', { exact: true })).toBeVisible();
   await expect(page.getByRole('status', { name: 'Loading image preview' })).toHaveCount(0);
 });
 
@@ -55,11 +57,11 @@ test('processing keeps the result in place and exposes an updating state', async
     };
   });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await page.getByRole('button', { name: 'Add Soften', exact: true }).click();
+  await addStep(page, 'Soften');
   await expect(page.getByLabel('Processing status')).toContainText('Ready');
   const before = (await page.locator('.preview').boundingBox())!;
-  await page.getByRole('slider', { name: 'Soften amount' }).fill('4');
-  await expect(page.getByLabel('Processing status')).toContainText('Changing pixels');
+  await page.getByRole('slider', { name: 'Softness' }).fill('4');
+  await expect(page.getByLabel('Processing status')).toContainText('Updating');
   expect(
     await page.getByLabel('Processing status').evaluate((el) => !!el.closest('[aria-busy=true]')),
   ).toBe(false);
@@ -76,6 +78,7 @@ for (const mode of ['Slider', 'Result'] as const) {
   test(`${mode} keeps its preview dimensions while a new image loads`, async ({ page }) => {
     await page.goto('/');
     await expect(page.getByLabel('Processing status')).toContainText('Ready');
+    await viewOptions(page);
     await page.getByRole('button', { name: mode, exact: true }).click();
     const before = (await page.locator('.preview').boundingBox())!;
     let release!: () => void;
@@ -86,7 +89,8 @@ for (const mode of ['Slider', 'Result'] as const) {
       await gate;
       await route.continue();
     });
-    await page.getByRole('button', { name: 'Use sample The mug' }).click();
+    await imageChoices(page);
+    await page.getByRole('button', { name: 'Use sample Mug', exact: true }).click();
     const status = page.getByRole('status', { name: 'Loading image preview' });
     await expect(status).toBeVisible();
     expect(await status.evaluate((el) => !!el.closest('[aria-busy=true]'))).toBe(false);
@@ -118,11 +122,9 @@ test('mobile learners can move between controls and results without hunting', as
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile workspace navigation');
   await page.goto('/');
-  await page.getByRole('button', { name: 'Add Soften', exact: true }).tap();
+  await addStep(page, 'Soften');
   await page.getByRole('link', { name: 'See preview', exact: true }).tap();
   await expect(page.getByRole('heading', { name: 'Preview', exact: true })).toBeInViewport();
   await page.getByRole('link', { name: 'Edit image & steps', exact: true }).tap();
-  await expect(
-    page.getByRole('heading', { name: 'Choose an image', exact: true }),
-  ).toBeInViewport();
+  await expect(page.getByRole('heading', { name: 'Your image', exact: true })).toBeInViewport();
 });

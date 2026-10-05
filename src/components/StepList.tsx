@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { operationByType, operations } from '../content/operations';
 import type { OperationType, ProcessingStep } from '../processing/types';
 import { Icon } from './Icon';
@@ -17,10 +17,41 @@ interface Props {
   onAdd: (type: OperationType) => void;
   onChange: (steps: ProcessingStep[]) => void;
   onSelect: (id: string) => void;
+  onCompare: (id: string) => void;
   onReset: () => void;
 }
-export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }: Props) {
+export function StepList({
+  steps,
+  selected,
+  onAdd,
+  onChange,
+  onSelect,
+  onCompare,
+  onReset,
+}: Props) {
   const [dragged, setDragged] = useState<string | null>(null);
+  const [collapsed, setCollapsed] = useState<string | null>(null);
+  const picker = useRef<HTMLDetailsElement>(null),
+    list = useRef<HTMLOListElement>(null),
+    firstAction = useRef<HTMLButtonElement>(null);
+  const previousLength = useRef(steps.length);
+  useEffect(() => {
+    if (steps.length !== previousLength.current) {
+      const added = steps.length > previousLength.current;
+      if (added || document.activeElement === document.body) {
+        const target = steps.length
+          ? list.current?.querySelector<HTMLButtonElement>('li:last-child .step-title')
+          : firstAction.current;
+        target?.focus({ preventScroll: true });
+      }
+    }
+    previousLength.current = steps.length;
+  }, [steps.length]);
+  function add(type: OperationType) {
+    setCollapsed(null);
+    if (picker.current) picker.current.open = false;
+    onAdd(type);
+  }
   function move(from: number, to: number) {
     if (to < 0 || to >= steps.length) return;
     const next = [...steps];
@@ -33,50 +64,61 @@ export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }
   return (
     <aside className="recipe" aria-labelledby="recipe-heading">
       <div className="section-heading">
-        <h2 id="recipe-heading">Processing steps</h2>
-        <button
-          className="text-button"
-          aria-label="Reset recipe"
-          onClick={onReset}
-          disabled={!steps.length}
-        >
-          <Icon name="reset" size={16} /> Reset
-        </button>
-      </div>
-      <p className="recipe-intro">Add a step. See what changes.</p>
-      <div className="add-steps">
-        <h3 className="visually-hidden">Add a processing step</h3>
-        {operations.map((o) => (
-          <button
-            key={o.type}
-            className="operation-button"
-            aria-label={`Add ${o.beginnerName}`}
-            disabled={steps.length >= 12}
-            onClick={() => onAdd(o.type)}
-          >
-            <span className="operation-icon">
-              <Icon name={operationIcons[o.type]} />
-            </span>
-            <span>
-              {o.beginnerName}
-              <small>{o.description}</small>
-            </span>
-            <Icon name="plus" size={18} />
+        <h2 id="recipe-heading">Your steps</h2>
+        {!!steps.length && (
+          <button className="text-button" onClick={onReset}>
+            <Icon name="reset" size={16} /> Start over
           </button>
-        ))}
-        {steps.length >= 12 && (
-          <p className="small">This recipe has 12 steps. Remove a step to add another.</p>
         )}
       </div>
-      <ol className="step-list">
+      {!steps.length && (
+        <div className="first-step">
+          <p>Start with a simple change.</p>
+          <button
+            ref={firstAction}
+            className="primary-button"
+            aria-label="Add Remove color"
+            onClick={() => add('grayscale')}
+          >
+            <Icon name="color" size={18} /> Remove color
+          </button>
+        </div>
+      )}
+      <details className="step-picker" ref={picker}>
+        <summary>Add a step</summary>
+        <div className="add-steps">
+          {operations.map((o) => (
+            <button
+              key={o.type}
+              className="operation-button"
+              aria-label={`Add ${o.beginnerName}`}
+              disabled={steps.length >= 12}
+              onClick={() => add(o.type)}
+            >
+              <span className="operation-icon">
+                <Icon name={operationIcons[o.type]} />
+              </span>
+              <span>
+                {o.beginnerName}
+                <small>{o.description}</small>
+              </span>
+            </button>
+          ))}
+          {steps.length >= 12 && (
+            <p className="small">You have 12 steps. Remove one to add another.</p>
+          )}
+        </div>
+      </details>
+      <ol className="step-list" ref={list}>
         {steps.map((step, index) => {
-          const definition = operationByType[step.type];
-          const parameter = definition.parameter;
+          const definition = operationByType[step.type],
+            parameter = definition.parameter;
+          const expanded = selected === step.id && collapsed !== step.id;
           return (
             <li
               key={step.id}
               data-step-type={step.type}
-              className={`step ${selected === step.id ? 'active' : ''} ${step.enabled ? '' : 'disabled'}`}
+              className={`step ${expanded ? 'active' : ''} ${step.enabled ? '' : 'disabled'}`}
               draggable
               onDragStart={(e) => {
                 setDragged(step.id);
@@ -96,81 +138,92 @@ export function StepList({ steps, selected, onAdd, onChange, onSelect, onReset }
               }}
             >
               <div className="step-top">
-                <span className="drag-handle" title="Drag to reorder">
-                  <Icon name="drag" size={16} />
+                <span className="step-index" aria-hidden="true">
+                  {index + 1}
                 </span>
                 <button
                   className="step-title"
                   aria-label={`Inspect ${definition.beginnerName} step`}
-                  onClick={() => onSelect(step.id)}
+                  aria-expanded={expanded}
+                  aria-controls={`controls-${step.id}`}
+                  onClick={() => {
+                    setCollapsed(expanded ? step.id : null);
+                    onSelect(step.id);
+                  }}
                 >
-                  <Icon name={operationIcons[step.type]} size={18} />
                   {definition.beginnerName}
-                </button>
-                <button
-                  className="icon-button"
-                  aria-label={`Delete ${definition.beginnerName}`}
-                  onClick={() => onChange(steps.filter((s) => s.id !== step.id))}
-                >
-                  <Icon name="close" size={16} />
+                  {!step.enabled && <small>Off</small>}
+                  <Icon name={expanded ? 'up' : 'down'} size={15} />
                 </button>
               </div>
-              {parameter && (
-                <label className="parameter-label">
-                  {parameter.label}
-                  <output>
-                    {step.value > 0 && step.type === 'brightness' ? '+' : ''}
-                    {step.value}
-                    {parameter.unit}
-                  </output>
-                  <input
-                    type="range"
-                    min={parameter.min}
-                    max={parameter.max}
-                    step={parameter.step}
-                    value={step.value}
-                    aria-label={parameter.label}
-                    onChange={(e) => update(step.id, { value: Number(e.target.value) })}
-                  />
-                </label>
-              )}
-              <div className="step-bottom">
-                <label className="enable-step">
-                  <input
-                    type="checkbox"
-                    checked={step.enabled}
-                    aria-label={`Enable ${definition.beginnerName}`}
-                    onChange={(e) => update(step.id, { enabled: e.target.checked })}
-                  />
-                  {step.enabled ? 'On' : 'Off'}
-                </label>
-                <span className="step-position">Step {index + 1}</span>
-                <div className="move-buttons">
-                  <button
-                    className="icon-button"
-                    aria-label={`Move ${definition.beginnerName} up`}
-                    disabled={index === 0}
-                    onClick={() => move(index, index - 1)}
-                  >
-                    <Icon name="up" size={16} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    aria-label={`Move ${definition.beginnerName} down`}
-                    disabled={index === steps.length - 1}
-                    onClick={() => move(index, index + 1)}
-                  >
-                    <Icon name="down" size={16} />
-                  </button>
-                </div>
+              <div id={`controls-${step.id}`} hidden={!expanded}>
+                {parameter && (
+                  <label className="parameter-label">
+                    {parameter.label}
+                    <output>
+                      {step.value > 0 && step.type === 'brightness' ? '+' : ''}
+                      {step.value}
+                    </output>
+                    <input
+                      type="range"
+                      min={parameter.min}
+                      max={parameter.max}
+                      step={parameter.step}
+                      value={step.value}
+                      aria-label={parameter.label}
+                      onChange={(e) => update(step.id, { value: Number(e.target.value) })}
+                    />
+                  </label>
+                )}
+                <details className="step-options">
+                  <summary>Step options</summary>
+                  <div className="step-options-body">
+                    <label className="enable-step">
+                      <input
+                        type="checkbox"
+                        checked={step.enabled}
+                        aria-label={`Use this step: ${definition.beginnerName}`}
+                        onChange={(e) => update(step.id, { enabled: e.target.checked })}
+                      />
+                      Use this step
+                    </label>
+                    <div className="move-buttons" aria-label="Change step order">
+                      <button
+                        className="secondary-button"
+                        aria-label={`Move up: ${definition.beginnerName}`}
+                        disabled={index === 0}
+                        onClick={() => move(index, index - 1)}
+                      >
+                        <Icon name="up" size={16} />
+                        Move up
+                      </button>
+                      <button
+                        className="secondary-button"
+                        aria-label={`Move down: ${definition.beginnerName}`}
+                        disabled={index === steps.length - 1}
+                        onClick={() => move(index, index + 1)}
+                      >
+                        <Icon name="down" size={16} />
+                        Move down
+                      </button>
+                    </div>
+                    <button className="text-button" onClick={() => onCompare(step.id)}>
+                      Compare this step
+                    </button>
+                    <button
+                      className="text-button remove-step"
+                      aria-label={`Remove step: ${definition.beginnerName}`}
+                      onClick={() => onChange(steps.filter((s) => s.id !== step.id))}
+                    >
+                      Remove step
+                    </button>
+                  </div>
+                </details>
               </div>
             </li>
           );
         })}
       </ol>
-      {!steps.length && (
-        <p className="empty-recipe">Your image is unchanged. Try Remove Color to begin.</p>
-      )}
     </aside>
   );
 }

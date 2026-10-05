@@ -23,7 +23,7 @@ type View = 'Playground' | 'Learn' | 'Challenges' | 'About';
 export default function App() {
   const [view, setView] = useState<View>('Playground');
   const [source, setSource] = useState<PixelImage | null>(null),
-    [sourceName, setSourceName] = useState('Color study'),
+    [sourceName, setSourceName] = useState<string>(samples[0].name),
     [sampleId, setSampleId] = useState('color-study');
   const [steps, setSteps] = useState<ProcessingStep[]>([]),
     [selected, setSelected] = useState<string | null>(null),
@@ -35,6 +35,11 @@ export default function App() {
   const [challengeId, setChallengeId] = useState<ChallengeId | null>(null),
     [hint, setHint] = useState(false),
     [attempted, setAttempted] = useState(false);
+  const [pixelsOpen, setPixelsOpen] = useState(false);
+  function inspectPixel(p: PixelPosition) {
+    setPixel(p);
+    setPixelsOpen(true);
+  }
   const inputRevision = useRef(0),
     pageHeading = useRef<HTMLHeadingElement>(null),
     previousView = useRef(view);
@@ -122,6 +127,7 @@ export default function App() {
   }
   function reset() {
     setSteps([]);
+    setPixelsOpen(false);
     setSelected(null);
     setScope('all');
     setPixel(null);
@@ -189,7 +195,7 @@ export default function App() {
             ))}
           </nav>
           <span className="header-note">
-            <Icon name="lock" size={14} /> Local processing
+            <Icon name="lock" size={14} /> Images stay on your device
           </span>
         </div>
       </header>
@@ -214,7 +220,7 @@ export default function App() {
                 {inputError || pipeline.error}
                 {pipeline.error ? (
                   <button className="text-button" onClick={pipeline.retry}>
-                    Restart processor
+                    Try processing again
                   </button>
                 ) : (
                   <button className="text-button" onClick={() => setInputError('')}>
@@ -263,13 +269,15 @@ export default function App() {
                   onSample={(id) => loadSample(id)}
                   onCamera={() => setCamera(true)}
                   loading={loading}
+                  sourceName={sourceName}
                 />
                 <StepList
                   steps={steps}
                   selected={selected}
                   onAdd={addStep}
                   onChange={changeSteps}
-                  onSelect={(id) => {
+                  onSelect={setSelected}
+                  onCompare={(id) => {
                     setSelected(id);
                     setScope('step');
                   }}
@@ -287,37 +295,33 @@ export default function App() {
                       scope={scope}
                       onScope={setScope}
                       pixel={pixel}
-                      onPixel={setPixel}
+                      onPixel={inspectPixel}
                       busy={pipeline.busy}
                       loading={loading}
                       sourceName={sourceName}
                     />
-                    {activeSteps >= 2 && (
-                      <div className="pipeline-discovery">
-                        <Icon name="book" size={19} />
-                        <div>
-                          <strong>You built an image-processing pipeline.</strong>
-                          <p>
-                            Each step transforms the information passed to the next step. Try moving
-                            a step to see why order matters.
-                          </p>
-                        </div>
-                      </div>
-                    )}
                     <div className="under-the-image">
-                      <PixelInspector
-                        before={before}
-                        after={after}
-                        pixel={pixel}
-                        onPixel={setPixel}
-                      />
                       <Explanation
                         key={selected ?? 'initial'}
                         type={explanationType}
                         enabled={steps.find((s) => s.id === selected)?.enabled ?? true}
                         before={explanationInput!}
                         pixel={pixel}
+                        hasSequence={activeSteps >= 2}
                       />
+                      <details
+                        className="pixel-details"
+                        open={pixelsOpen}
+                        onToggle={(e) => setPixelsOpen(e.currentTarget.open)}
+                      >
+                        <summary>Explore pixels</summary>
+                        <PixelInspector
+                          before={before}
+                          after={after}
+                          pixel={pixel}
+                          onPixel={inspectPixel}
+                        />
+                      </details>
                     </div>
                   </>
                 ) : loading ? (
@@ -337,15 +341,14 @@ export default function App() {
             <span className="eyebrow">About Image Machine</span>
             <h1>Understanding starts with seeing.</h1>
             <p className="about-lead">
-              Image Machine is a small, open-source learning environment for a big idea: computers
-              see images as numbers.
+              Image Machine helps you understand how computers see images as numbers.
             </p>
             <section>
               <h2>See it → Try it → Understand it → Look inside</h2>
               <p>
-                We start with the image, not the equation. Use five simple operations to discover
-                pixels, intensity, smoothing, segmentation, and edges. When you meet these ideas
-                later in Python or OpenCV, they’ll already feel familiar.
+                Try a change, compare the images, then explore why it worked. Five simple steps help
+                you understand colors, brightness, small details, and outlines. These ideas will
+                feel familiar when you start working with images in code.
               </p>
             </section>
             <section>
@@ -360,9 +363,8 @@ export default function App() {
             <section>
               <h2>Small by design.</h2>
               <p>
-                This is a place to understand image processing, not a photo editor or model trainer.
-                The five operations help turn visual information into useful clues for computer
-                vision.
+                Five simple steps help you see what changed and why. You can explore how a computer
+                finds useful details, such as shapes and outlines.
               </p>
               <p>
                 Large images are resized to a maximum of 960 pixels on the longest side. Files up to

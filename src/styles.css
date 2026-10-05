@@ -318,11 +318,6 @@ nav button.current:after {
   outline-offset: -5px;
   background: var(--tint);
 }
-.input-note {
-  font-size: 0.8125rem;
-  color: var(--muted);
-  margin: 6px 0 12px;
-}
 .source-buttons {
   display: flex;
   gap: 8px;
@@ -378,11 +373,6 @@ nav button.current:after {
   padding: 18px;
   min-width: 0;
 }
-.recipe-intro {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  margin: 4px 0 12px;
-}
 .add-steps {
   display: grid;
   gap: 5px;
@@ -413,11 +403,6 @@ nav button.current:after {
 .operation-button small {
   display: none;
 }
-.empty-recipe {
-  color: var(--muted);
-  font-size: 0.8125rem;
-  padding-top: 14px;
-}
 .step-list {
   list-style: none;
   margin: 0;
@@ -433,9 +418,9 @@ nav button.current:after {
 .step {
   border: 1px solid var(--line);
   border-radius: 4px;
-  padding: 8px;
   position: relative;
   background: #fff;
+  padding: 10px;
 }
 .step.active {
   border-color: var(--accent);
@@ -450,23 +435,18 @@ nav button.current:after {
 .step-top {
   display: flex;
   align-items: center;
-  gap: 3px;
-}
-.drag-handle {
-  color: var(--muted);
-  cursor: grab;
-  display: flex;
+  gap: 10px;
 }
 .step-title {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8125rem;
   font-weight: 600;
   text-align: left;
   flex: 1;
   padding: 6px 0;
   min-width: 0;
+  font-size: 0.875rem;
 }
 .step-top > .icon-button {
   min-width: 32px;
@@ -484,23 +464,12 @@ nav button.current:after {
   font-family: ui-monospace, monospace;
   color: var(--accent);
 }
-.step-bottom {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 3px;
-}
 .enable-step {
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.75rem;
   min-height: 36px;
-}
-.step-position {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 0.6875rem;
 }
 .move-buttons {
   display: flex;
@@ -671,43 +640,13 @@ canvas {
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.machine-model {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 9px;
-  padding: 12px 0;
-  border-top: 1px solid var(--line);
-  font-size: 0.6875rem;
-  color: var(--muted);
-}
-.machine-model svg {
-  color: #83938d;
-}
-.pipeline-discovery {
-  display: flex;
-  align-items: start;
-  gap: 10px;
-  padding: 0 4px;
-  color: var(--accent);
-}
-.pipeline-discovery > svg {
-  margin-top: 2px;
-}
-.pipeline-discovery strong {
-  font-size: 0.8125rem;
-  font-weight: 600;
-}
-.pipeline-discovery p {
-  font-size: 0.8125rem;
-  color: var(--muted);
-  margin-top: 2px;
-}
 .under-the-image {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 20px;
+  display: block;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 20px;
 }
 .skeleton-caption {
   min-height: 22px;
@@ -721,10 +660,6 @@ canvas {
   height: 12px;
   border-radius: 3px;
   background: #e6eae8;
-}
-.skeleton-toolbar > .skeleton-line {
-  width: 220px;
-  height: 34px;
 }
 .skeleton-image {
   animation: skeleton-pulse 1.5s ease-in-out infinite alternate;
@@ -752,26 +687,13 @@ canvas {
   font-size: 1rem;
 }
 .inspector .section-heading > span {
-  padding-left: 30px;
   font-size: 0.75rem;
+  padding-left: 0;
 }
 .inspector-empty {
   padding: 21px 0 3px;
-  text-align: center;
-}
-.pixel-grid-icon {
-  display: grid;
-  grid-template-columns: repeat(3, 12px);
-  gap: 3px;
-  justify-content: center;
-  margin: 0 auto 14px;
-}
-.pixel-grid-icon span {
-  height: 12px;
-  background: #e2e9dd;
-}
-.pixel-grid-icon span:nth-child(5) {
-  background: var(--accent);
+  text-align: left;
+  padding-top: 14px;
 }
 .inspector-empty p {
   font-size: 0.8125rem;
@@ -884,12 +806,7 @@ canvas {
 .explanation-heading h2 {
   font-size: 1rem;
   margin-top: 3px;
-}
-.level-label {
-  font-size: 0.625rem;
-  color: var(--accent);
-  margin-left: auto;
-  letter-spacing: 0.08em;
+  margin: 0;
 }
 .simple-explanation {
   font-size: 0.875rem;
@@ -912,6 +829,7 @@ canvas {
 }
 .understand-content {
   padding: 12px 0 15px;
+  padding-bottom: 4px;
 }
 .understand-content p,
 .technical-content p {
@@ -1344,6 +1262,169 @@ canvas {
   margin-top: 20px;
 }
 /* Responsive flow follows the document: image, steps, preview, explanations. */
+.workspace-jumps {
+  display: none;
+}
+.look-inside summary > span:first-child {
+  display: inline;
+  padding: 0;
+  font-size: inherit;
+}
+.inspector-empty p,
+.simple-explanation,
+.understand-content p,
+.technical-content p {
+  font-size: 0.875rem;
+}
+
+.image-surface:focus-within {
+  outline: 3px solid #ba761c;
+  outline-offset: 3px;
+}
+.result-preview .skeleton-caption {
+  min-height: 22px;
+}
+/* Keep the first view focused; reveal related choices together when requested. */
+.current-image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  font-size: 0.875rem;
+  min-width: 0;
+}
+.current-image img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.current-image span {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.source-picker > summary,
+.step-picker > summary,
+.view-options > summary,
+.step-options > summary,
+.pixel-details > summary {
+  font-size: 0.8125rem;
+  color: var(--accent);
+  padding: 8px 0;
+  min-height: 36px;
+}
+.source-picker .input-options {
+  padding-top: 10px;
+}
+.first-step {
+  padding-top: 12px;
+}
+.first-step p {
+  color: var(--muted);
+  font-size: 0.875rem;
+  margin-bottom: 12px;
+}
+.first-step .primary-button {
+  width: 100%;
+}
+.step-picker {
+  margin-top: 12px;
+}
+.step-picker > summary {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 9px 12px;
+}
+.step-picker[open] > summary {
+  margin-bottom: 8px;
+}
+.step-picker .add-steps {
+  grid-template-columns: 1fr;
+}
+.step-picker .operation-button {
+  font-size: 0.875rem;
+  padding: 12px 10px;
+}
+.step-picker .operation-button small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.step-index {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-size: 0.75rem;
+  background: #f0f3f2;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.step-title svg {
+  margin-left: auto;
+}
+.step-title small {
+  color: var(--muted);
+  font-weight: 400;
+}
+.step-options {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+}
+.step-options-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px 0;
+}
+.step-options .move-buttons {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.step-options .text-button {
+  justify-content: start;
+}
+.remove-step {
+  color: #8a392d;
+}
+.view-options {
+  margin: 10px 0 16px;
+}
+.view-options > .preview-toolbar {
+  margin: 6px 0 0;
+}
+.skeleton-view-options {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+.under-the-image .explanation {
+  border: 0;
+  padding: 0;
+}
+.sequence-explanation {
+  border-left: 2px solid var(--line);
+  padding-left: 12px;
+}
+.pixel-details {
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 4px;
+}
+.pixel-details .inspector {
+  border: 0;
+  padding: 16px 0 0;
+}
+.explanation-context {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
 @media (max-width: 1050px) {
   .header-note {
     display: none;
@@ -1399,12 +1480,11 @@ canvas {
     gap: 18px;
   }
   .control-panel {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: block;
   }
   .image-input {
-    border-bottom: 0;
-    border-right: 1px solid var(--line);
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
   .image-input,
   .recipe {
@@ -1449,6 +1529,31 @@ canvas {
   .challenge-actions {
     flex-wrap: wrap;
   }
+  .workspace-jumps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #f5f6f6;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 14px;
+    padding: 8px 0;
+  }
+  .workspace-jumps a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 0;
+    font-size: 0.8125rem;
+    text-decoration: none;
+  }
+  #image-controls,
+  #preview-heading {
+    scroll-margin-top: 72px;
+  }
 }
 @media (max-width: 540px) {
   .header-inner {
@@ -1470,9 +1575,6 @@ canvas {
   }
   .recipe {
     padding: 14px;
-  }
-  .input-note {
-    margin: 4px 0 10px;
   }
   .drop-note {
     display: none;
@@ -1547,21 +1649,9 @@ canvas {
   .skeleton-caption {
     min-height: 42px;
   }
-  .skeleton-toolbar {
-    min-height: 85px;
-  }
-  .skeleton-toolbar > .skeleton-line {
-    width: 100%;
-  }
   .under-the-image {
     grid-template-columns: 1fr;
-  }
-  .machine-model {
-    gap: 6px;
-    font-size: 0.625rem;
-  }
-  .machine-model svg {
-    width: 12px;
+    padding: 16px;
   }
   .processing-status {
     font-size: 0.6875rem;
@@ -1606,6 +1696,21 @@ canvas {
   .neighborhood {
     flex-wrap: wrap;
   }
+  .source-picker .samples {
+    grid-template-columns: 1fr 1fr;
+  }
+  .source-picker .sample {
+    flex-direction: row;
+    font-size: 0.8125rem;
+    align-items: center;
+  }
+  .source-picker .sample img {
+    width: 36px;
+    height: 36px;
+  }
+  .preview-meta {
+    font-size: 0.75rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -1615,53 +1720,4 @@ canvas {
     transition: none !important;
     scroll-behavior: auto !important;
   }
-}
-.workspace-jumps {
-  display: none;
-}
-.look-inside summary > span:first-child {
-  display: inline;
-  padding: 0;
-  font-size: inherit;
-}
-.inspector-empty p,
-.simple-explanation,
-.understand-content p,
-.technical-content p {
-  font-size: 0.875rem;
-}
-@media (max-width: 760px) {
-  .workspace-jumps {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px;
-    position: sticky;
-    top: 0;
-    z-index: 5;
-    background: #f5f6f6;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 14px;
-    padding: 8px 0;
-  }
-  .workspace-jumps a {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 0;
-    font-size: 0.8125rem;
-    text-decoration: none;
-  }
-  #image-controls,
-  #preview-heading {
-    scroll-margin-top: 72px;
-  }
-}
-
-.image-surface:focus-within {
-  outline: 3px solid #ba761c;
-  outline-offset: 3px;
-}
-.result-preview .skeleton-caption {
-  min-height: 22px;
 }

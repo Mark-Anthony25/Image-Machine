@@ -1,21 +1,3 @@
-import { Icon } from './Icon';
-
-export function LearningModel() {
-  return (
-    <div className="machine-model" aria-label="Learning model">
-      <span>Image</span>
-      <Icon name="arrow" size={15} />
-      <span>Pixels</span>
-      <Icon name="arrow" size={15} />
-      <span>Transformation</span>
-      <Icon name="arrow" size={15} />
-      <span>New values</span>
-      <Icon name="arrow" size={15} />
-      <span>Useful information</span>
-    </div>
-  );
-}
-
 /** Reserves the same image area as the preview while an input is decoded. */
 export function ImageSkeleton({ mode = 'split' }: { mode?: 'split' | 'slider' | 'result' }) {
   return (
@@ -59,16 +41,14 @@ export function PreviewSkeleton() {
         <h2 id="preview-heading">Preview</h2>
         <span className="processing-status">Loading image…</span>
       </div>
-      <div className="preview-toolbar skeleton-toolbar" aria-hidden="true">
-        <span className="skeleton-line" />
+      <div className="view-options skeleton-view-options" aria-hidden="true">
         <span className="skeleton-line" />
       </div>
       <ImageSkeleton />
       <div className="preview-meta">
-        <span>Preparing your image for local processing</span>
-        <span>Click or tap to look at a pixel</span>
+        <span>Loading your image…</span>
+        <span>Tap an image to explore its pixels</span>
       </div>
-      <LearningModel />
     </section>
   );
 }

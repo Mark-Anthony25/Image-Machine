@@ -29,11 +29,11 @@ export function OrderExperiment({ source }: { source: PixelImage | null }) {
           <span className="recipe-letter">A</span>
           <span>Soften</span>
           <Icon name="arrow" size={18} />
-          <span>Find Edges</span>
+          <span>Find edges</span>
         </div>
         <div>
           <span className="recipe-letter">B</span>
-          <span>Find Edges</span>
+          <span>Find edges</span>
           <Icon name="arrow" size={18} />
           <span>Soften</span>
         </div>
@@ -54,23 +54,23 @@ export function OrderExperiment({ source }: { source: PixelImage | null }) {
         <>
           <div className="order-results">
             <figure>
-              <figcaption>A · Soften, then Find Edges</figcaption>
+              <figcaption>A · Soften, then Find edges</figcaption>
               <PixelCanvas image={first.frames[3]} label="Soften then find edges result" />
             </figure>
             <figure>
-              <figcaption>B · Find Edges, then Soften</figcaption>
+              <figcaption>B · Find edges, then Soften</figcaption>
               <PixelCanvas image={second.frames[3]} label="Find edges then soften result" />
             </figure>
           </div>
           <div className="discovery-note">
             <Icon name="book" />
             <div>
-              <strong>You just discovered an image-processing pipeline.</strong>
-              <p>Each step changes the information received by the next step.</p>
+              <strong>You built a sequence of steps.</strong>
+              <p>Each step uses the result of the one before it.</p>
               <p>
-                Softening first reduces small variations before edges are measured. Softening
-                afterward blends the edges already found. Try more images: the difference depends on
-                their pixels.
+                Soften first to remove small specks before finding outlines. Soften afterward to
+                blur the outlines you already found. This sequence is called an image-processing
+                pipeline.
               </p>
             </div>
           </div>

@@ -6,11 +6,12 @@ An interactive, browser-only introduction to image processing for students with 
 
 **See it → Try it → Understand it → Look inside**
 
-Choose a sample, upload an image, or capture a camera frame. Build an image recipe and watch the pixels change. Explore why computers remove color, adjust brightness, soften details, separate light and dark, and find boundaries.
+Choose a sample, upload an image, or capture a camera frame. Add a few steps and watch the image change. Explore why computers remove color, adjust brightness, soften details, separate light and dark, and find boundaries.
 
 ## Features
 
-- Five focused operations with adjustable parameters and immediate previews.
+- One clear first action, five focused image changes, and immediate previews.
+- Image choices, step options, view settings, and pixel numbers appear when requested.
 - Enable, disable, delete, and reorder steps; desktop dragging and keyboard/touch move buttons.
 - Original/final and individual-step comparisons, side-by-side previews, a comparison slider, and a result view.
 - Pixel inspection with matching input/output RGB values, intensity, a magnified neighborhood, and arrow-key navigation.
@@ -60,13 +61,13 @@ public/          Local samples and favicon
 
 Each operation has a beginner name, technical name, parameter definition, explanations, purpose, and a pure processing function. To add an operation, extend `OperationType`, implement the pixel transformation, add its educational definition and icon, and test its numerical behavior. UI controls consume the definitions.
 
-| Beginner action       | Technical process                                                           |
-| --------------------- | --------------------------------------------------------------------------- |
-| Remove Color          | Rounded `0.299R + 0.587G + 0.114B` intensity                                |
-| Brightness            | Add a value to each RGB channel and clamp to 0–255                          |
-| Soften                | Normalized, separable Gaussian convolution; radius `ceil(3σ)`               |
-| Separate Light & Dark | Rounded intensity at or above threshold becomes 255; otherwise 0            |
-| Find Edges            | Sobel gradients on intensity; magnitude × sensitivity / 4, clamped to 0–255 |
+| Beginner action   | Technical process                                                           |
+| ----------------- | --------------------------------------------------------------------------- |
+| Remove color      | Rounded `0.299R + 0.587G + 0.114B` intensity                                |
+| Adjust brightness | Add a value to each RGB channel and clamp to 0–255                          |
+| Soften            | Normalized, separable Gaussian convolution; radius `ceil(3σ)`               |
+| Black & white     | Rounded intensity at or above threshold becomes 255; otherwise 0            |
+| Find edges        | Sobel gradients on intensity; magnitude × sensitivity / 4, clamped to 0–255 |
 
 Convolution repeats pixels at image borders. Operations preserve alpha; input images are first composited onto white. Values are educational 8-bit image channels, not linear-light photometric measurements. Sobel is a basic edge detector; it is not Canny or an object-recognition model.
 

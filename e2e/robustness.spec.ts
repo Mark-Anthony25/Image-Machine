@@ -1,3 +1,4 @@
+import { addStep, imageChoices, inspectCenter } from './helpers';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -12,7 +13,7 @@ test('the untouched input is explained truthfully', async ({ page }) => {
 test('the first mobile transformation is reachable immediately', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-specific first action');
   await page.goto('/');
-  const button = page.getByRole('button', { name: 'Add Remove Color' });
+  const button = page.getByRole('button', { name: 'Add Remove color' });
   await expect(button).toBeInViewport();
   await button.tap();
   await expect(page.locator('[data-step-type=grayscale]')).toHaveCount(1);
@@ -63,7 +64,9 @@ test('large dimensions are resized and oversized files are rejected', async ({ p
     mimeType: 'image/png',
     buffer: Buffer.from(encoded, 'base64'),
   });
-  await expect(page.getByText('large.png · 960 × 480 pixels')).toBeVisible();
+  await expect(page.locator('.preview-meta')).toContainText('large.png');
+  await expect(page.locator('canvas').first()).toHaveAttribute('width', '960');
+  await expect(page.locator('canvas').first()).toHaveAttribute('height', '480');
   await page.getByLabel('Image file').setInputFiles({
     name: 'huge.png',
     mimeType: 'image/png',
@@ -75,11 +78,11 @@ test('large dimensions are resized and oversized files are rejected', async ({ p
 
 test('rapid slider edits settle on the newest pixel values', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Add Brightness', exact: true }).click();
-  const range = page.getByRole('slider', { name: 'Brightness adjustment' });
+  await addStep(page, 'Adjust brightness');
+  const range = page.getByRole('slider', { name: 'Brightness' });
   for (const v of ['-100', '80', '-50', '120']) await range.fill(v);
   await expect(page.getByLabel('Processing status')).toContainText('Ready');
-  await page.getByRole('button', { name: 'Inspect the center pixel' }).click();
+  await inspectCenter(page);
   const before = (await page.getByTestId('pixel-before').getAttribute('data-rgb'))!
     .split(',')
     .map(Number);
@@ -109,6 +112,7 @@ test('camera denial is actionable and the modal can close', async ({ page }) => 
     });
   });
   await page.goto('/');
+  await imageChoices(page);
   await page.getByRole('button', { name: 'Use camera', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('alert')).toContainText('Allow camera access');
@@ -138,10 +142,14 @@ test('camera tracks stop after capture and after cancellation', async ({ page })
     });
   });
   await page.goto('/');
+  await imageChoices(page);
   await page.getByRole('button', { name: 'Use camera', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Capture image' })).toBeEnabled();
   await page.getByRole('button', { name: 'Capture image' }).click();
-  await expect(page.getByText('Camera image · 160 × 120 pixels')).toBeVisible();
+  await expect(
+    page.locator('.preview-meta').getByText('Camera image', { exact: true }),
+  ).toBeVisible();
+  await imageChoices(page);
   await page.getByRole('button', { name: 'Use camera', exact: true }).click();
   await page.getByRole('button', { name: 'Close camera' }).click();
   expect(
@@ -170,8 +178,8 @@ test('a failed worker can restart without losing the image', async ({ page }) =>
   await page.evaluate(() => {
     (window as unknown as { allowTestWorker: boolean }).allowTestWorker = true;
   });
-  await page.getByRole('button', { name: 'Restart processor' }).click();
-  await page.getByRole('button', { name: 'Add Remove Color', exact: true }).click();
+  await page.getByRole('button', { name: 'Try processing again' }).click();
+  await addStep(page, 'Remove color');
   await expect(page.getByLabel('Processing status')).toContainText('Ready');
   await expect(page.getByRole('alert')).toHaveCount(0);
 });
@@ -184,7 +192,7 @@ test('the interface remains usable at enlarged text and narrow widths', async ({
   expect(
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1),
   ).toBe(true);
-  await page.getByRole('button', { name: 'Add Remove Color', exact: true }).click();
+  await addStep(page, 'Remove color');
   await expect(page.locator('[data-step-type=grayscale]')).toHaveCount(1);
 });
 
@@ -199,10 +207,10 @@ test('the main views and expanded controls have no axe WCAG A/AA violations', as
     expect(result.violations, JSON.stringify(result.violations, null, 2)).toEqual([]);
   }
   await page.getByRole('button', { name: 'Playground', exact: true }).click();
-  await page.getByRole('button', { name: 'Add Soften', exact: true }).click();
-  await page.getByRole('button', { name: 'Why did this happen?' }).click();
+  await addStep(page, 'Soften');
+  await page.getByRole('button', { name: 'Why it works' }).click();
   await page.getByText('Look inside', { exact: true }).click();
-  await page.getByRole('button', { name: 'Inspect the center pixel' }).click();
+  await inspectCenter(page);
   const result = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
@@ -216,8 +224,8 @@ test('image processing never sends pixels or activity off the device', async ({ 
       requests.push(r.method() + ' ' + r.url());
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Add Remove Color', exact: true }).click();
-  await page.getByRole('button', { name: 'Add Find Edges', exact: true }).click();
+  await addStep(page, 'Remove color');
+  await addStep(page, 'Find edges');
   await expect(page.getByLabel('Processing status')).toContainText('Ready');
   expect(requests).toEqual([]);
 });

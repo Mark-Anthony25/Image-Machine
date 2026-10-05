@@ -69,7 +69,7 @@ export function CameraDialog({
       onCancel={onClose}
     >
       <div className="section-heading">
-        <h2 id="camera-title">Put yourself in the machine.</h2>
+        <h2 id="camera-title">Use your camera</h2>
         <button className="icon-button" onClick={onClose} aria-label="Close camera">
           <Icon name="close" />
         </button>
